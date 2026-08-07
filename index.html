@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 일본어 단어 암기장</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f7f4ee;
+            --card-bg: #fcfbfa;
+            --text-main: #33302e;
+            --text-sub: #7a7571;
+            --accent-color: #8c7355;
+            --border-color: #e8e3d9;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --hide-bg: #efece6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header / Date Banner */
+        .header-subtitle {
+            font-size: 15px;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .header-title {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .header-date-sub {
+            font-size: 16px;
+            color: var(--text-sub);
+            margin-bottom: 16px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background-color: var(--accent-color);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Hide Controls */
+        .controls-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            font-size: 15px;
+            color: var(--text-sub);
+            font-weight: 500;
+            margin-right: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-main);
+            user-select: none;
+        }
+
+        .checkbox-group input {
+            cursor: pointer;
+            width: 17px;
+            height: 17px;
+            accent-color: var(--accent-color);
+        }
+
+        /* Main Content Box */
+        .main-card {
+            background-color: var(--card-bg);
+            width: 100%;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            min-height: 380px;
+            margin-bottom: 20px;
+        }
+
+        .word-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* Box/card spacing removed, using bottom border */
+        }
+
+        .word-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 1.2fr 1.2fr;
+            align-items: center;
+            padding: 8px 10px; /* Reduced vertical padding for tighter line height */
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--border-color); /* Underline style */
+            transition: background-color 0.15s ease;
+        }
+
+        .word-item:last-child {
+            border-bottom: none;
+        }
+
+        .word-item:hover {
+            background-color: rgba(140, 115, 85, 0.04);
+        }
+
+        .word-index {
+            font-size: 14px; /* Increased 1 pt */
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .cell {
+            padding: 3px 6px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            word-break: break-word;
+        }
+
+        .cell.meaning {
+            font-size: 16px; /* Increased 1 pt (15px -> 16px) */
+            font-weight: 500;
+            color: #2b2826;
+        }
+
+        .cell.japanese {
+            font-size: 17px; /* Increased 1 pt (16px -> 17px) */
+            font-weight: 700;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #1a1918;
+        }
+
+        .cell.reading {
+            font-size: 15px; /* Increased 1 pt (14px -> 15px) */
+            color: #55504c;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        /* Hidden State Style */
+        .cell.hidden-cell {
+            background-color: var(--hide-bg);
+            color: transparent !important;
+            user-select: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cell.hidden-cell::after {
+            content: "클릭하여 보기";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: var(--text-sub);
+            opacity: 0.6;
+            font-weight: 400;
+        }
+
+        .cell.hidden-cell.revealed {
+            background-color: transparent;
+            color: inherit !important;
+        }
+
+        .cell.hidden-cell.revealed::after {
+            display: none;
+        }
+
+        /* Date Navigation Bar (Single row: past dates -> today) */
+        .date-history-nav {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        .date-tab {
+            font-size: 15px; /* Increased 1 pt */
+            color: var(--text-sub);
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
+
+        .date-tab:hover {
+            color: var(--text-main);
+            background-color: #eae5dc;
+        }
+
+        .date-tab.active {
+            color: #ffffff;
+            font-weight: 600;
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .footer-note {
+            margin-top: 35px;
+            font-size: 12px;
+            color: var(--text-sub);
+            letter-spacing: 1px;
+        }
+
+        /* Loading / Error overlay */
+        .loading {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-sub);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .word-item {
+                grid-template-columns: 28px 1fr 1fr;
+                grid-template-rows: auto auto;
+                gap: 4px;
+                padding: 10px 4px;
+            }
+
+            .cell.reading {
+                grid-column: 2 / -1;
+                font-size: 14px;
+                border-top: 1px dashed var(--border-color);
+                padding-top: 4px;
+            }
+
+            .controls-card {
+                gap: 10px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-subtitle">오 늘 의 &nbsp; 단 어</div>
+        <div class="header-title" id="display-date-title">8월 7일</div>
+        <div class="header-date-sub" id="display-date-sub">2026년 금요일</div>
+        <div class="divider"></div>
+
+        <!-- Mask / Hide Checkboxes -->
+        <div class="controls-card">
+            <span class="control-label">가리기 설정:</span>
+            <label class="checkbox-group">
+                <input type="checkbox" id="hide-meaning" onchange="updateMasking()">
+                한글 의미
+            </label>
+            <label class="checkbox-group">
+                <input type="checkbox" id="hide-japanese" onchange="updateMasking()">
+                일본어 표기
+            </label>
+            <label class="checkbox-group">
+                <input type="checkbox" id="hide-reading" onchange="updateMasking()">
+                읽기/활용형
+            </label>
+        </div>
+
+        <!-- Main Vocabulary Card Container -->
+        <div class="main-card">
+            <div id="word-container" class="word-list">
+                <div class="loading">구글 시트에서 단어 데이터를 불러오는 중입니다...</div>
+            </div>
+        </div>
+
+        <!-- Date Selector (Past 3 days + Today in one line) -->
+        <div class="date-history-nav" id="past-days-nav">
+            <!-- Dynamically generated buttons: [8월4일] [8월5일] [8월6일] [오늘] -->
+        </div>
+    </div>
+
+    <div class="footer-note">JAPANESE VOCABULARY MEMORY MEMO</div>
+
+    <script>
+        const SHEET_ID = '12tbJhjBVppvsOQ86nZPTuXVQ2Xu82qnj-BqvRXxFV00';
+
+        let allWords = [];
+        let currentOffset = 0;
+
+        const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+
+        // Define Google Visualization JSONP Callback Object
+        window.google = window.google || {};
+        window.google.visualization = window.google.visualization || {};
+        window.google.visualization.Query = {
+            setResponse: function(response) {
+                if (response && response.table && response.table.rows) {
+                    allWords = parseGvizRows(response.table.rows);
+                    renderDayWords(currentOffset);
+                } else {
+                    showError("시트 데이터가 비어 있거나 형식이 바르지 않습니다.");
+                }
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPastDaysNav();
+            loadSheetDataViaScript();
+        });
+
+        function loadSheetDataViaScript() {
+            const script = document.createElement('script');
+            script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:google.visualization.Query.setResponse`;
+            script.onerror = function() {
+                showError("구글 시트에 접근할 수 없습니다.<br><b>[파일] > [공유] > [웹에 게시]</b>가 설정되었는지 확인하세요.");
+            };
+            document.body.appendChild(script);
+        }
+
+        function showError(msg) {
+            document.getElementById('word-container').innerHTML = `
+                <div class="loading" style="color: #c0392b;">
+                    <b>데이터 로딩 실패</b><br><br>
+                    ${msg}<br><br>
+                    <small style="color: #666;">
+                        ※ 구글 시트 메뉴에서 <b>[파일] → [공유] → [웹에 게시] → [게시]</b> 버튼까지 완료하셨는지 확인해 주세요.
+                    </small>
+                </div>
+            `;
+        }
+
+        function parseGvizRows(rows) {
+            const data = [];
+
+            rows.forEach(row => {
+                const cells = row.c;
+                if (!cells) return;
+
+                const colB = cells[1] ? (cells[1].v || '') : ''; 
+                const colC = cells[2] ? (cells[2].v || '') : ''; 
+                const colD = cells[3] ? (cells[3].v || '') : ''; 
+                const colE = cells[4] ? (cells[4].v || '') : ''; 
+
+                const readingCombo = [colD, colE].filter(Boolean).join(' / ');
+
+                if (colB || colC || readingCombo) {
+                    data.push({
+                        meaning: String(colB),
+                        japanese: String(colC),
+                        reading: String(readingCombo)
+                    });
+                }
+            });
+
+            if (data.length > 0 && (data[0].meaning.includes("의미") || data[0].meaning.includes("한글") || data[0].japanese.includes("일본어"))) {
+                data.shift();
+            }
+
+            return data;
+        }
+
+        function getDayIndexForDate(targetDate) {
+            const startDate = new Date(2026, 7, 1); // 2026-08-01 기준
+            const diffTime = targetDate - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return Math.max(0, diffDays);
+        }
+
+        function renderDayWords(offset) {
+            currentOffset = offset;
+
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + offset);
+
+            const month = targetDate.getMonth() + 1;
+            const date = targetDate.getDate();
+            const year = targetDate.getFullYear();
+            const dayOfWeek = dayNames[targetDate.getDay()];
+
+            document.getElementById('display-date-title').innerText = `${month}월 ${date}일`;
+            document.getElementById('display-date-sub').innerText = `${year}년 ${dayOfWeek}`;
+
+            renderPastDaysNav();
+
+            const dayIdx = getDayIndexForDate(targetDate);
+            const startIndex = dayIdx * 10;
+            const dayWords = allWords.slice(startIndex, startIndex + 10);
+
+            const container = document.getElementById('word-container');
+
+            if (dayWords.length === 0) {
+                container.innerHTML = `<div class="loading">해당 날짜에 등록된 단어가 없습니다.</div>`;
+                return;
+            }
+
+            let html = '';
+            dayWords.forEach((word, idx) => {
+                html += `
+                    <div class="word-item">
+                        <div class="word-index">${idx + 1}</div>
+                        <div class="cell meaning" onclick="toggleSingleCell(this)">${escapeHtml(word.meaning)}</div>
+                        <div class="cell japanese" onclick="toggleSingleCell(this)">${escapeHtml(word.japanese)}</div>
+                        <div class="cell reading" onclick="toggleSingleCell(this)">${escapeHtml(word.reading)}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateMasking();
+        }
+
+        function updateMasking() {
+            const hideMeaning = document.getElementById('hide-meaning').checked;
+            const hideJapanese = document.getElementById('hide-japanese').checked;
+            const hideReading = document.getElementById('hide-reading').checked;
+
+            const rows = document.querySelectorAll('.word-item');
+            rows.forEach(row => {
+                const meaningCell = row.querySelector('.meaning');
+                const japaneseCell = row.querySelector('.japanese');
+                const readingCell = row.querySelector('.reading');
+
+                setCellMask(meaningCell, hideMeaning);
+                setCellMask(japaneseCell, hideJapanese);
+                setCellMask(readingCell, hideReading);
+            });
+        }
+
+        function setCellMask(cell, shouldHide) {
+            if (!cell) return;
+            cell.classList.remove('revealed');
+            if (shouldHide) {
+                cell.classList.add('hidden-cell');
+            } else {
+                cell.classList.remove('hidden-cell');
+            }
+        }
+
+        function toggleSingleCell(cell) {
+            if (cell.classList.contains('hidden-cell')) {
+                cell.classList.toggle('revealed');
+            }
+        }
+
+        function loadDateOffset(offset) {
+            renderDayWords(offset);
+        }
+
+        function renderPastDaysNav() {
+            const nav = document.getElementById('past-days-nav');
+            let html = '';
+
+            // 1. Past 3 days in ascending chronological order (e.g., 8월4일 -> 8월5일 -> 8월6일)
+            for (let i = 3; i >= 1; i--) {
+                const pastDate = new Date();
+                pastDate.setDate(pastDate.getDate() - i);
+                const month = pastDate.getMonth() + 1;
+                const date = pastDate.getDate();
+                const offset = -i;
+                const isActive = (currentOffset === offset) ? 'active' : '';
+
+                html += `<button class="date-tab ${isActive}" onclick="loadDateOffset(${offset})">${month}월 ${date}일</button>`;
+            }
+
+            // 2. Today button at the end
+            const isTodayActive = (currentOffset === 0) ? 'active' : '';
+            html += `<button class="date-tab ${isTodayActive}" onclick="loadDateOffset(0)">오늘</button>`;
+
+            nav.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
